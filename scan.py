@@ -65,7 +65,7 @@ def identify(inputLines):
 tokenList = []
 #read input file
 file = open('inputfile.txt', 'r')
-#split tokens from input file
+#split tokens from input file, remove spaces
 inputSplitted = file.read().split()
 #identify each token in the list & append it to TokenList
 identify(inputSplitted)
