@@ -58,7 +58,7 @@ def DFAstate (token):
 
 
 #list of TINY language token classes
-identifiers = [['+', '-', '*', '/', '=', '<', '(', ')', ';', ':'],
+identifiers = [['+', '-', '*', '/', '=', '<', '(', ')', ';', ':='],
                ['if', 'then', 'else', 'end', 'repeat', 'until', 'read', 'write']]
 
 #function to label & store special symbols in TokenList
@@ -85,46 +85,63 @@ def other(lexeme):
     except ValueError:
         isIdentifier(lexeme)
 
+# Print token list
+def printToken():
+    for t in range(len(tokenList)):
+        print("Lexeme : '" + tokenList[t].get("lexeme","none") + "' , Class : '"+ tokenList[t].get("class","none")+"'")                         
+
+
+comment = False
+
 #function to identify each lexeme, label it & store it labeled in TokenList
 def identify(inputLines):
-    comment = False
+    global comment
     for lexeme in inputLines:
         if comment is True and not('}' in lexeme) :
             continue
         if lexeme in identifiers[0]:
-            isSpecialSymbol(lexeme)
-        elif ':' in lexeme:
-            isSpecialSymbol(lexeme)        
+            isSpecialSymbol(lexeme)       
         elif lexeme in identifiers[1]:
             isReservedWord(lexeme)
-        elif ';' in lexeme:
-            if lexeme.replace(';','') in identifiers[1]:
-                isReservedWord(lexeme.replace(';',''))
-            else:
-                other(lexeme.replace(';',''))
-            isSpecialSymbol(';')
-        elif '{' in lexeme and '}' not in lexeme  :
+        elif lexeme == '{':
             comment = True  
         elif '}' in lexeme :
                 comment = False 
+        #case where lexeme contains multiple tokens with no whitespaces in between
         else:
-            other(lexeme)
-    for t in range(len(tokenList)):
-        print("Lexeme : '" + tokenList[t].get("lexeme","none") + "' , Class : '"+ tokenList[t].get("class","none")+"'")         
+            temp = []
+            for x in identifiers[0]:
+                if x in lexeme:
+                   temp = lexeme.split(x)
+                   temp.insert(1,x)                         
+            if len(temp) != 0:
+                identify(temp)
+            elif '{' in lexeme:
+                temp = lexeme.split('{')    
+                temp.insert(1, '{')
+                identify(temp)
+            elif '}' in lexeme:
+                temp = lexeme.split('}')
+                temp.insert(1, '}')
+                identify(temp)   
+            elif lexeme != '' and lexeme != ' ':                              
+                other(lexeme)
 
 #tokens array to be filled with each lexeme after being identified 
 tokenList = []
 #read input file
-file = open('tiny_sample_code.txt', 'r')
+file = open('tiny_sample_code (1).txt', 'r')
 sourceCode = file.read()
 #split tokens from input file, remove spaces
 inputSplitted = sourceCode.split()
-#identify each token in the list & append it to TokenList
-identify(inputSplitted)
 #DFA State transition
 stateLog = []
 DFAstate(sourceCode)
+#identify each token in the list & append it to TokenList
+identify(inputSplitted)
+#print token list
+printToken()
 with open('scanner_output.txt', 'w') as f:
     for item in tokenList:
-        f.write("%s\n" % item)
+        f.write("%s\n" % item)    
 

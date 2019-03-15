@@ -22,7 +22,6 @@
 {'class': 'Identifier', 'lexeme': 'x'}
 {'class': 'Special Symbol', 'lexeme': '-'}
 {'class': 'Number', 'lexeme': '1'}
-{'class': 'Special Symbol', 'lexeme': ';'}
 {'class': 'Reserved Word', 'lexeme': 'until'}
 {'class': 'Identifier', 'lexeme': 'x'}
 {'class': 'Special Symbol', 'lexeme': '='}
@@ -31,3 +30,9 @@
 {'class': 'Reserved Word', 'lexeme': 'write'}
 {'class': 'Identifier', 'lexeme': 'fact'}
 {'class': 'Reserved Word', 'lexeme': 'end'}
+{'class': 'Reserved Word', 'lexeme': 'if'}
+{'class': 'Identifier', 'lexeme': 'cv'}
+{'class': 'Special Symbol', 'lexeme': '<'}
+{'class': 'Number', 'lexeme': '2'}
+{'class': 'Reserved Word', 'lexeme': 'then'}
+{'class': 'Reserved Word', 'lexeme': 'repeat'}
