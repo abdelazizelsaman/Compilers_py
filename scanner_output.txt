@@ -1,0 +1,33 @@
+{'class': 'Reserved Word', 'lexeme': 'read'}
+{'class': 'Identifier', 'lexeme': 'x'}
+{'class': 'Special Symbol', 'lexeme': ';'}
+{'class': 'Reserved Word', 'lexeme': 'if'}
+{'class': 'Number', 'lexeme': '0'}
+{'class': 'Special Symbol', 'lexeme': '<'}
+{'class': 'Identifier', 'lexeme': 'x'}
+{'class': 'Reserved Word', 'lexeme': 'then'}
+{'class': 'Identifier', 'lexeme': 'fact'}
+{'class': 'Special Symbol', 'lexeme': ':='}
+{'class': 'Number', 'lexeme': '1'}
+{'class': 'Special Symbol', 'lexeme': ';'}
+{'class': 'Reserved Word', 'lexeme': 'repeat'}
+{'class': 'Identifier', 'lexeme': 'fact'}
+{'class': 'Special Symbol', 'lexeme': ':='}
+{'class': 'Identifier', 'lexeme': 'fact'}
+{'class': 'Special Symbol', 'lexeme': '*'}
+{'class': 'Identifier', 'lexeme': 'x'}
+{'class': 'Special Symbol', 'lexeme': ';'}
+{'class': 'Identifier', 'lexeme': 'x'}
+{'class': 'Special Symbol', 'lexeme': ':='}
+{'class': 'Identifier', 'lexeme': 'x'}
+{'class': 'Special Symbol', 'lexeme': '-'}
+{'class': 'Number', 'lexeme': '1'}
+{'class': 'Special Symbol', 'lexeme': ';'}
+{'class': 'Reserved Word', 'lexeme': 'until'}
+{'class': 'Identifier', 'lexeme': 'x'}
+{'class': 'Special Symbol', 'lexeme': '='}
+{'class': 'Number', 'lexeme': '0'}
+{'class': 'Special Symbol', 'lexeme': ';'}
+{'class': 'Reserved Word', 'lexeme': 'write'}
+{'class': 'Identifier', 'lexeme': 'fact'}
+{'class': 'Reserved Word', 'lexeme': 'end'}

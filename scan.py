@@ -115,7 +115,7 @@ def identify(inputLines):
 #tokens array to be filled with each lexeme after being identified 
 tokenList = []
 #read input file
-file = open('inputfile.txt', 'r')
+file = open('tiny_sample_code.txt', 'r')
 sourceCode = file.read()
 #split tokens from input file, remove spaces
 inputSplitted = sourceCode.split()
@@ -124,4 +124,7 @@ identify(inputSplitted)
 #DFA State transition
 stateLog = []
 DFAstate(sourceCode)
+with open('scanner_output.txt', 'w') as f:
+    for item in tokenList:
+        f.write("%s\n" % item)
 
