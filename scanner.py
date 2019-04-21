@@ -15,11 +15,11 @@ def __isReservedWord(lexeme):
 
 #function to label & store numbers in TokenList
 def __isNum(lexeme):
-    __tokenList.append({"class" : "Number", "lexeme" : lexeme})
+    __tokenList.append({"class" : "number", "lexeme" : lexeme})
 
 #function to label & store identifiers in TokenList
 def __isIdentifier(lexeme):
-    __tokenList.append({"class" : "Identifier", "lexeme" : lexeme})
+    __tokenList.append({"class" : "identifier", "lexeme" : lexeme})
 
 #function to check whether the lexeme is number or identifier
 def __other(lexeme):
