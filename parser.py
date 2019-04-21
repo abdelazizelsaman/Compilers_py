@@ -29,11 +29,14 @@ def getToken(param):
         StopIteration()    
 
 def match(token, param):
+    flag = False
     if token == getToken(param):
         success()
+        flag = True
     else:
         failed()
     nextToken()
+    return flag 
    
 
 def program():
@@ -59,8 +62,8 @@ def statament():
     elif 'write' == getToken(TOKENLEXEME):
         writeStmt()
     else:
-        match(False,TOKENCLASS)    
-        nextToken()
+        match(False,TOKENCLASS)
+        statament()    
 
 
 def ifstmt():
@@ -131,7 +134,8 @@ def factor():
     elif getToken(TOKENCLASS) == IDENTIFIER:
         match(getToken(TOKENCLASS), TOKENCLASS)
     else:
-        match(False,TOKENCLASS)    
+        match(False,TOKENCLASS) 
+        factor()   
 
 
 program()
