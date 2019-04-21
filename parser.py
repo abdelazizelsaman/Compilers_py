@@ -1,130 +1,140 @@
 import scanner
+from enum import Enum 
 index = 0
+TOKENCLASS = 'class'
+TOKENLEXEME = 'lexeme'
+IDENTIFIER = 'identifier'
+NUMBER = 'number'
+
 tokenList_dummy = []
 file = open('tiny_sample_code.txt', 'r')
 tokenList_dummy = scanner.tokenize(file.read())
+print(tokenList_dummy)
 
 def success():
-    print('Expected')
+    print('Expected Input : ' + str(getToken(TOKENLEXEME)))
 
 def failed():
-     print('Error')   
+     print('Syntax Error : ' + str(getToken(TOKENLEXEME)))
 
 def nextToken():
     global index
     index = index + 1
 
-def getTokenClass():
+def getToken(param):
     global index
-    return  tokenList_dummy[index].get('class', 'none')
+    if index < len(tokenList_dummy):
+        return  tokenList_dummy[index].get(param, 'none')
+    else:
+        StopIteration()    
 
-def getToken():
-    global index
-    return  tokenList_dummy[index].get('lexeme', 'none')
-
-def match(identifier, token):
-    state = True if identifier == token else False
-    print('Expected' if state else 'Error')
+def match(token, param):
+    if token == getToken(param):
+        success()
+    else:
+        failed()
+    nextToken()
+   
 
 def program():
-    stmtseq()
+    stmtSeq()
 
-def stmtseq():
+def stmtSeq():
     statament()
-    if ';' == getToken():
+    while getToken(TOKENLEXEME) == ';':
+        match(';', TOKENLEXEME)
         statament()
 
 
 
 def statament():
-    if 'if' == getTokenClass():
+    if 'if' == getToken(TOKENLEXEME):
         ifstmt()
-    elif 'repeat' == getTokenClass():
-        repeatstmt()
-    elif 'assign' == getTokenClass():
+    elif 'repeat' == getToken(TOKENLEXEME):
+        repeatStmt()
+    elif IDENTIFIER == getToken(TOKENCLASS):
         assignstmt()
-    elif 'read' == getTokenClass():
-        readstmt()
-    elif 'write' == getTokenClass():
-        writestmt()
+    elif 'read' == getToken(TOKENLEXEME):
+        readStmt()
+    elif 'write' == getToken(TOKENLEXEME):
+        writeStmt()
     else:
-        failed()
+        match(False,TOKENCLASS)    
+        nextToken()
+
 
 def ifstmt():
+    match('if', TOKENLEXEME)
     exp()
-    match('then', getTokenClass())
+    match('then', TOKENLEXEME)
+    stmtSeq()
+    if getToken(TOKENLEXEME) == 'else':
+        match('else', TOKENLEXEME)
+        stmtSeq()
+    match('end', TOKENLEXEME)    
 
-def repeatstmt():
-    stmtseq()
-    if 'until' == getToken():
-        exp()
-    else:
-        failed()
-    return True
+def repeatStmt():
+    match('repeat', TOKENLEXEME)
+    stmtSeq()
+    match('until', TOKENLEXEME)
+    exp()
 
 def assignstmt():
-    if getToken() not in scanner.__identifiers[1]:
-        if getToken() == '=:':
-            exp()
-    else:
-        failed()
+    match(IDENTIFIER, TOKENCLASS)
+    match(':=', TOKENLEXEME)
+    exp()
         
 
-def readstmt():
-    if getToken not in scanner.__identifiers[1]:
-        success()
-    else:
-        failed()    
+def readStmt():
+    match('read', TOKENLEXEME)
+    match(IDENTIFIER, TOKENCLASS)   
         
 
-def writestmt():
+def writeStmt():
+    match('write', TOKENLEXEME)
     exp()
 
 def exp():
-    simpleexp()
-    if '=' == getToken | '<' == getToken():
-        comparisonop()
-        simpleexp()
-    else:
-        exp()
+    simpleExp()
+    if '=' == getToken(TOKENLEXEME) or '<' == getToken(TOKENLEXEME):
+        comparisonOp()
+        simpleExp()
 
-def comparisonop():
-    success()
+def comparisonOp():
+    match(getToken(TOKENLEXEME),TOKENLEXEME)
 
-def simpleexp():
-    if '+' == getToken() | '-' == getToken():
-        addop()
-        term()
-    else:
+def simpleExp():
+    term()
+    while getToken(TOKENLEXEME) == '+' or getToken(TOKENLEXEME) == '-':
+        addOp() 
         term()
 
-def addop():
-    success()
+def addOp():
+    match(getToken(TOKENLEXEME),TOKENLEXEME)
 
 def term():
-    if '*' == getToken() | '/' == getToken():
-        mulop()
-        factor()
-    else:
+    factor()
+    while getToken(TOKENLEXEME) == '/' or getToken(TOKENLEXEME) == '*':
+        mulOp()
         factor()
 
-def mulop():
-    success()
+def mulOp():
+    match(getToken(TOKENLEXEME),TOKENLEXEME)
 
 def factor():
-    if '(' == getToken():
+    if '(' == getToken(TOKENLEXEME):
+        match('(',TOKENLEXEME)
         exp()
-        if ')' != getToken():
-            failed()
-    elif getToken() in [0,1,2,3,4,5,6,7,8,9]:
-        success()
-    elif getToken() not in scanner.__identifiers[1]:
-        success()
+        match(')',TOKENLEXEME)
+    elif getToken(TOKENCLASS) == NUMBER:
+        match(getToken(TOKENCLASS), TOKENCLASS)
+    elif getToken(TOKENCLASS) == IDENTIFIER:
+        match(getToken(TOKENCLASS), TOKENCLASS)
     else:
-        failed()    
+        match(False,TOKENCLASS)    
 
 
-
+program()
 
 
         
