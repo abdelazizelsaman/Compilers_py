@@ -1,5 +1,6 @@
 import scanner
 index = 0
+state = 'program'
 TOKENCLASS = 'class'
 TOKENLEXEME = 'lexeme'
 IDENTIFIER = 'identifier'
@@ -7,7 +8,7 @@ NUMBER = 'number'
 FLAG = True
 flag_rep = False
 PROGRAM = 'program'
-STMTSEQ = ' stmt_sequence'
+STMTSEQ = 'stmt_sequence'
 STATAMENT = 'statament'
 IFSTMT = 'if-stmt'
 REPEATSTMT = 'repeat-stmt'
@@ -25,27 +26,35 @@ THEN = 'then'
 END = 'end'
 UNTIL = 'until'
 TERM = 'term'
-FOUND = ' is Found in '
+FOUND = ' is found in '
 MISSING = ' is Missing in '
 
+
+parser_log = []
 tokenList_dummy = []
-file = open('tiny_sample_code.txt', 'r')
+file = open('test.txt', 'r')
 tokenList_dummy = scanner.tokenize(file.read())
-print(tokenList_dummy)
+#print(tokenList_dummy)
+
+def cstate(strg):
+    global state
+    state = strg
 
 def printOutput(strg):
-    with open('parser_output.txt', 'w') as f:
-        f.write("%s\n" % strg)   
+    global parser_log
+    print(strg)
+    parser_log.append(strg)
+
 
 def success():
     global FLAG
     FLAG = True
-    print('Expected Input : '+getToken(TOKENLEXEME))
+    #printOutput('Expected Input : '+getToken(TOKENLEXEME))
 
 def failed():
     global FLAG
     FLAG = False
-    print('Syntax Error : ')
+    printOutput('Syntax Error : ')
 
 def nextToken():
     global index
@@ -72,119 +81,123 @@ def match(token, param):
 def program():
     global index
     ##
-    print(PROGRAM + FOUND)
+    printOutput(PROGRAM + FOUND)
     ##
     stmtSeq()
     if index < len(tokenList_dummy):
-        print('Syntax Error : Expected ; \n') 
+        printOutput('Syntax Error : Expected ; in ' + state+'\n') 
         program()
 
 def stmtSeq():
-    print(STMTSEQ + FOUND)
+    printOutput(STMTSEQ + FOUND + state)
     statament()
     while getToken(TOKENLEXEME) == ';':
         match(';', TOKENLEXEME)
         statament()
 
 
-
 def statament():
     if 'if' == getToken(TOKENLEXEME):
-        print(STATAMENT + FOUND)
+        printOutput(STATAMENT + FOUND + state)
+        cstate(IFSTMT)
         ifstmt()
     elif 'repeat' == getToken(TOKENLEXEME):
-        print(STATAMENT + FOUND)
+        printOutput(STATAMENT + FOUND + state)
+        cstate(READSTMT)
         repeatStmt()
     elif IDENTIFIER == getToken(TOKENCLASS):
-        print(STATAMENT + FOUND)
+        printOutput(STATAMENT + FOUND + state)
+        cstate(ASSIGNSTMT)
         assignstmt()
     elif 'read' == getToken(TOKENLEXEME):
-        print(STATAMENT + FOUND)
+        printOutput(STATAMENT + FOUND + state)
+        cstate(READSTMT)
         readStmt()
     elif 'write' == getToken(TOKENLEXEME):
-        print(STATAMENT +FOUND)
+        printOutput(STATAMENT +FOUND + state)
+        cstate(WRITESTMT)
         writeStmt()
     else:
         if index < len(tokenList_dummy) and not flag_rep:
             match(False,TOKENCLASS)
-            print(STATAMENT + MISSING)
+            printOutput(STATAMENT + MISSING)
             statament()    
 
 
 def ifstmt():
-    print(IFSTMT+FOUND if match('if', TOKENLEXEME) else IFSTMT+MISSING+IFSTMT)
-    print(IF+FOUND)
+    printOutput(IFSTMT+FOUND + state if match('if', TOKENLEXEME) else IFSTMT+MISSING+IFSTMT)
+    printOutput(IF+FOUND + state)
     exp()
-    print( THEN+FOUND if  match('then', TOKENLEXEME) else THEN+MISSING+IFSTMT)
+    printOutput( THEN+FOUND + state if  match('then', TOKENLEXEME) else THEN+MISSING+IFSTMT)
     stmtSeq()
     if getToken(TOKENLEXEME) == 'else':
-        print( ELSE+FOUND if match('else', TOKENLEXEME) else ELSE+MISSING+IFSTMT)
+        printOutput( ELSE+FOUND + state if match('else', TOKENLEXEME) else ELSE+MISSING+IFSTMT)
         stmtSeq()
-    print(END+FOUND if match('end', TOKENLEXEME) else END+MISSING+IFSTMT)    
+    printOutput(END+FOUND + state if match('end', TOKENLEXEME) else END+MISSING+IFSTMT)    
 
 def repeatStmt():
     global flag_rep
     flag_rep = True
-    print( REPEATSTMT+FOUND if match('repeat', TOKENLEXEME) else REPEATSTMT+MISSING+REPEATSTMT)
+    printOutput( REPEATSTMT+FOUND + state if match('repeat', TOKENLEXEME) else REPEATSTMT+MISSING+REPEATSTMT)
     stmtSeq()
-    print(UNTIL+FOUND if match('until', TOKENLEXEME) else UNTIL+MISSING+REPEATSTMT)
+    printOutput(UNTIL+FOUND + state if match('until', TOKENLEXEME) else UNTIL+MISSING+REPEATSTMT)
     exp()
     flag_rep = False
 
 def assignstmt():
-    print(ASSIGNSTMT+FOUND)
-    print(IDENTIFIER+FOUND)
+    printOutput(ASSIGNSTMT+FOUND + state)
+    printOutput(IDENTIFIER+FOUND + state)
     match(IDENTIFIER, TOKENCLASS)
     if match(':=', TOKENLEXEME):
-        print(':='+FOUND)
+        printOutput(':='+FOUND + state)
         exp()
     else:
-        print('=:'+MISSING+ASSIGNSTMT)
+        printOutput('=:'+MISSING+ASSIGNSTMT)
     
         
 
 def readStmt():
-    print(READSTMT+FOUND)
+    printOutput(READSTMT+FOUND + state)
     match('read', TOKENLEXEME)
-    print(IDENTIFIER+FOUND if match(IDENTIFIER, TOKENCLASS) else IDENTIFIER+MISSING+READSTMT)   
+    printOutput(IDENTIFIER+FOUND + state if match(IDENTIFIER, TOKENCLASS) else IDENTIFIER+MISSING+READSTMT)   
         
 
 def writeStmt():
-    print(WRITESTMT+FOUND)
+    printOutput(WRITESTMT+FOUND + state)
     match('write', TOKENLEXEME)
     exp()
 
 def exp():
-    print(EXP+FOUND)
+    printOutput(EXP+FOUND + state)
     simpleExp()
     if '=' == getToken(TOKENLEXEME) or '<' == getToken(TOKENLEXEME):
         comparisonOp()
         simpleExp()
 
 def comparisonOp():
-    print(COMPARISONOP+FOUND)
+    printOutput(COMPARISONOP+FOUND + state)
     match(getToken(TOKENLEXEME),TOKENLEXEME)
 
 def simpleExp():
-    print(SIMPLEEXP+FOUND)
+    printOutput(SIMPLEEXP+FOUND + state)
     term()
     while getToken(TOKENLEXEME) == '+' or getToken(TOKENLEXEME) == '-':
         addOp() 
         term()
 
 def addOp():
-    print(ADDOP+FOUND)
+    printOutput(ADDOP+FOUND + state)
     match(getToken(TOKENLEXEME),TOKENLEXEME)
 
 def term():
-    print(TERM+FOUND)
+    printOutput(TERM+FOUND + state)
     factor()
     while getToken(TOKENLEXEME) == '/' or getToken(TOKENLEXEME) == '*':
         mulOp()
         factor()
 
 def mulOp():
-    print(MULOP+FOUND)
+    printOutput(MULOP+FOUND + state)
     match(getToken(TOKENLEXEME),TOKENLEXEME)
 
 def factor():
@@ -193,19 +206,17 @@ def factor():
         exp()
         match(')',TOKENLEXEME)
     elif getToken(TOKENCLASS) == NUMBER:
-        print(NUMBER+FOUND)
+        printOutput(NUMBER+FOUND + state)
         match(getToken(TOKENCLASS), TOKENCLASS) 
     elif getToken(TOKENCLASS) == IDENTIFIER:
         match(getToken(TOKENCLASS), TOKENCLASS)
     else:
         match(False,TOKENCLASS)
-        print('factor'+MISSING+TERM) 
+        printOutput('factor'+MISSING+TERM) 
         factor()   
 
 
 program()
-
-
-        
-                
-        
+with open('parser_output.txt', 'w') as f:
+    for item in parser_log:
+        f.write("%s\n" % item)    
