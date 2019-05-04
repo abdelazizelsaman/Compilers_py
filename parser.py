@@ -7,6 +7,7 @@ IDENTIFIER = 'identifier'
 NUMBER = 'number'
 FLAG = True
 flag_rep = False
+flag_if = False
 PROGRAM = 'program'
 STMTSEQ = 'stmt_sequence'
 STATAMENT = 'statament'
@@ -29,16 +30,18 @@ TERM = 'term'
 FOUND = ' is found in '
 MISSING = ' is Missing in '
 
-
+state_log = []
 parser_log = []
 tokenList_dummy = []
-file = open('test.txt', 'r')
+file = open('tiny_sample_code.txt', 'r')
 tokenList_dummy = scanner.tokenize(file.read())
 #print(tokenList_dummy)
 
 def cstate(strg):
     global state
+    global state_log
     state = strg
+    state_log.append(strg)
 
 def printOutput(strg):
     global parser_log
@@ -98,53 +101,74 @@ def stmtSeq():
 
 def statament():
     if 'if' == getToken(TOKENLEXEME):
-        printOutput(STATAMENT + FOUND + state)
-        cstate(IFSTMT)
+        printOutput(STATAMENT + FOUND )
         ifstmt()
     elif 'repeat' == getToken(TOKENLEXEME):
-        printOutput(STATAMENT + FOUND + state)
-        cstate(READSTMT)
+        printOutput(STATAMENT + FOUND)
         repeatStmt()
     elif IDENTIFIER == getToken(TOKENCLASS):
-        printOutput(STATAMENT + FOUND + state)
-        cstate(ASSIGNSTMT)
+        printOutput(STATAMENT + FOUND)
         assignstmt()
     elif 'read' == getToken(TOKENLEXEME):
-        printOutput(STATAMENT + FOUND + state)
-        cstate(READSTMT)
+        printOutput(STATAMENT + FOUND)
         readStmt()
     elif 'write' == getToken(TOKENLEXEME):
-        printOutput(STATAMENT +FOUND + state)
-        cstate(WRITESTMT)
+        printOutput(STATAMENT +FOUND)
         writeStmt()
     else:
-        if index < len(tokenList_dummy) and not flag_rep:
+        if index < len(tokenList_dummy) and not flag_rep and not flag_if :
             match(False,TOKENCLASS)
             printOutput(STATAMENT + MISSING)
             statament()    
 
 
 def ifstmt():
+    global flag_if
+    flag_if = True
+    cstate(IFSTMT)
     printOutput(IFSTMT+FOUND + state if match('if', TOKENLEXEME) else IFSTMT+MISSING+IFSTMT)
     printOutput(IF+FOUND + state)
     exp()
-    printOutput( THEN+FOUND + state if  match('then', TOKENLEXEME) else THEN+MISSING+IFSTMT)
-    stmtSeq()
-    if getToken(TOKENLEXEME) == 'else':
-        printOutput( ELSE+FOUND + state if match('else', TOKENLEXEME) else ELSE+MISSING+IFSTMT)
+
+    if match('then', TOKENLEXEME):
+        printOutput(THEN+FOUND+state)
+        cstate(THEN)
         stmtSeq()
-    printOutput(END+FOUND + state if match('end', TOKENLEXEME) else END+MISSING+IFSTMT)    
+    else:
+        printOutput(THEN+MISSING+IFSTMT)
+
+    if getToken(TOKENLEXEME) == 'else':
+        printOutput(ELSE+FOUND)
+        cstate(ELSE)
+        stmtSeq()
+    else:
+        printOutput(ELSE+MISSING+IFSTMT)
+        
+    if match('end', TOKENLEXEME):
+        printOutput(END+FOUND + state)
+        cstate(END)
+        flag_if = False
+    else:
+        printOutput(END+MISSING + IFSTMT)
+
 
 def repeatStmt():
+    cstate(REPEATSTMT)
     global flag_rep
     flag_rep = True
     printOutput( REPEATSTMT+FOUND + state if match('repeat', TOKENLEXEME) else REPEATSTMT+MISSING+REPEATSTMT)
     stmtSeq()
-    printOutput(UNTIL+FOUND + state if match('until', TOKENLEXEME) else UNTIL+MISSING+REPEATSTMT)
+    if match('until', TOKENLEXEME):
+        printOutput(UNTIL+FOUND+state)
+        cstate(UNTIL)
+    else:
+        printOutput(UNTIL+MISSING+REPEATSTMT)
     exp()
     flag_rep = False
 
 def assignstmt():
+    cstate(ASSIGNSTMT)
+    cstate(IDENTIFIER)
     printOutput(ASSIGNSTMT+FOUND + state)
     printOutput(IDENTIFIER+FOUND + state)
     match(IDENTIFIER, TOKENCLASS)
@@ -157,12 +181,14 @@ def assignstmt():
         
 
 def readStmt():
+    cstate(READSTMT)
     printOutput(READSTMT+FOUND + state)
     match('read', TOKENLEXEME)
     printOutput(IDENTIFIER+FOUND + state if match(IDENTIFIER, TOKENCLASS) else IDENTIFIER+MISSING+READSTMT)   
         
 
 def writeStmt():
+    cstate(WRITESTMT)
     printOutput(WRITESTMT+FOUND + state)
     match('write', TOKENLEXEME)
     exp()
@@ -171,6 +197,7 @@ def exp():
     printOutput(EXP+FOUND + state)
     simpleExp()
     if '=' == getToken(TOKENLEXEME) or '<' == getToken(TOKENLEXEME):
+        cstate(getToken(TOKENLEXEME))
         comparisonOp()
         simpleExp()
 
@@ -186,6 +213,7 @@ def simpleExp():
         term()
 
 def addOp():
+    cstate(ADDOP)
     printOutput(ADDOP+FOUND + state)
     match(getToken(TOKENLEXEME),TOKENLEXEME)
 
@@ -197,6 +225,7 @@ def term():
         factor()
 
 def mulOp():
+    cstate(MULOP)
     printOutput(MULOP+FOUND + state)
     match(getToken(TOKENLEXEME),TOKENLEXEME)
 
@@ -206,10 +235,13 @@ def factor():
         exp()
         match(')',TOKENLEXEME)
     elif getToken(TOKENCLASS) == NUMBER:
+        cstate(NUMBER)
         printOutput(NUMBER+FOUND + state)
         match(getToken(TOKENCLASS), TOKENCLASS) 
     elif getToken(TOKENCLASS) == IDENTIFIER:
+        cstate(IDENTIFIER)
         match(getToken(TOKENCLASS), TOKENCLASS)
+        printOutput(IDENTIFIER+FOUND + state)
     else:
         match(False,TOKENCLASS)
         printOutput('factor'+MISSING+TERM) 
@@ -219,4 +251,17 @@ def factor():
 program()
 with open('parser_output.txt', 'w') as f:
     for item in parser_log:
+        f.write("%s\n" % item)    
+"""
+l = state_log
+
+for i in range(len(l)) :
+    if l[i] == IDENTIFIER:
+        if i+1 < len(l):
+            if l[i+1] == IDENTIFIER:
+                l.remove(i+1)
+
+"""
+with open('state_log.txt', 'w') as f:
+    for item in l:
         f.write("%s\n" % item)    
