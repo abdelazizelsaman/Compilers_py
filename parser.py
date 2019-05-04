@@ -263,5 +263,5 @@ for i in range(len(l)) :
 
 """
 with open('state_log.txt', 'w') as f:
-    for item in l:
+    for item in parser_log:
         f.write("%s\n" % item)    
