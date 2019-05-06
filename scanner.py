@@ -1,3 +1,18 @@
+#   CSE 226 Design of Compilers - CHEP ASU
+#   Author: Ahmed Abdelaziz
+#   Project title: Scanner for TINY language complier
+#   Project Description:
+
+#       The role of the scanner is to perform lexical analysis
+#       which splits program source code into substrings called tokens 
+#       and classify each token to their role (token class).
+
+#       This scanner accepts input as a txt file & named "inputfile.txt"  
+#       & generates output as an array of dictionarys where each dict is 
+#       labeled token in this format:
+#           {class: SyntaxKind.ConstKeyword, lexeme: ‘const’}
+
+
 
 #tokens array to be filled with each lexeme after being identified 
 __tokenList = []

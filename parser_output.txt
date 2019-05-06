@@ -1,0 +1,66 @@
+program is found in 
+stmt_sequence is found in program
+statament is found in 
+read-stmt is found in read-stmt
+identifier is found in read-stmt
+statament is found in 
+if-stmt is found in if-stmt
+if is found in if-stmt
+exp is found in if-stmt
+simple-exp is found in if-stmt
+term is found in if-stmt
+number is found in number
+comparison-op is found in <
+simple-exp is found in <
+term is found in <
+identifier is found in identifier
+then is found in identifier
+stmt_sequence is found in then
+statament is found in 
+assign-stmt is found in identifier
+identifier is found in identifier
+:= is found in identifier
+exp is found in identifier
+simple-exp is found in identifier
+term is found in identifier
+number is found in number
+statament is found in 
+repeat-stmt is found in repeat-stmt
+stmt_sequence is found in repeat-stmt
+statament is found in 
+assign-stmt is found in identifier
+identifier is found in identifier
+:= is found in identifier
+exp is found in identifier
+simple-exp is found in identifier
+term is found in identifier
+identifier is found in identifier
+mulop is found in mulop
+identifier is found in identifier
+statament is found in 
+assign-stmt is found in identifier
+identifier is found in identifier
+:= is found in identifier
+exp is found in identifier
+simple-exp is found in identifier
+term is found in identifier
+identifier is found in identifier
+addop is found in addop
+term is found in addop
+number is found in number
+until is found in number
+exp is found in until
+simple-exp is found in until
+term is found in until
+identifier is found in identifier
+comparison-op is found in =
+simple-exp is found in =
+term is found in =
+number is found in number
+statament is found in 
+write-stmt is found in write-stmt
+exp is found in write-stmt
+simple-exp is found in write-stmt
+term is found in write-stmt
+identifier is found in identifier
+end is found in identifier

@@ -1,4 +1,15 @@
+#   CSE 226 Design of Compilers - CHEP ASU
+#   Author: Ahmed Abdelaziz
+#   Project title: Parser for TINY language complier
+#   Project Description:
+
+#       The role of the parser is to take input in the form of a sequence
+#       of tokens or program instructions and build a data structure 
+#       in the form of a parse tree or an abstract syntax tree.
+
+
 import scanner
+from itertools import groupby
 index = 0
 state = 'program'
 TOKENCLASS = 'class'
@@ -8,6 +19,9 @@ NUMBER = 'number'
 FLAG = True
 flag_rep = False
 flag_if = False
+flag_as = False
+flag_wr = False
+
 PROGRAM = 'program'
 STMTSEQ = 'stmt_sequence'
 STATAMENT = 'statament'
@@ -40,8 +54,18 @@ tokenList_dummy = scanner.tokenize(file.read())
 def cstate(strg):
     global state
     global state_log
+    global flag_if
     state = strg
-    state_log.append(strg)
+    level = ""
+    if flag_if:
+        level += "|--"
+    if flag_rep:
+        level += "|--"
+    if flag_as:
+        level += "|--"   
+    if flag_wr:
+        level += "|--"
+    state_log.append(level+strg)
 
 def printOutput(strg):
     global parser_log
@@ -124,8 +148,9 @@ def statament():
 
 def ifstmt():
     global flag_if
-    flag_if = True
     cstate(IFSTMT)
+    flag_if = True
+    
     printOutput(IFSTMT+FOUND + state if match('if', TOKENLEXEME) else IFSTMT+MISSING+IFSTMT)
     printOutput(IF+FOUND + state)
     exp()
@@ -141,13 +166,13 @@ def ifstmt():
         printOutput(ELSE+FOUND)
         cstate(ELSE)
         stmtSeq()
-    else:
-        printOutput(ELSE+MISSING+IFSTMT)
+    #else:
+        #printOutput(ELSE+MISSING+IFSTMT)
         
     if match('end', TOKENLEXEME):
         printOutput(END+FOUND + state)
-        cstate(END)
         flag_if = False
+        cstate(END)
     else:
         printOutput(END+MISSING + IFSTMT)
 
@@ -168,6 +193,8 @@ def repeatStmt():
 
 def assignstmt():
     cstate(ASSIGNSTMT)
+    global flag_as
+    flag_as = True
     cstate(IDENTIFIER)
     printOutput(ASSIGNSTMT+FOUND + state)
     printOutput(IDENTIFIER+FOUND + state)
@@ -177,6 +204,7 @@ def assignstmt():
         exp()
     else:
         printOutput('=:'+MISSING+ASSIGNSTMT)
+    flag_as = False    
     
         
 
@@ -189,9 +217,12 @@ def readStmt():
 
 def writeStmt():
     cstate(WRITESTMT)
+    global flag_wr
+    flag_wr = True
     printOutput(WRITESTMT+FOUND + state)
     match('write', TOKENLEXEME)
     exp()
+    flag_wr = False
 
 def exp():
     printOutput(EXP+FOUND + state)
@@ -252,16 +283,9 @@ program()
 with open('parser_output.txt', 'w') as f:
     for item in parser_log:
         f.write("%s\n" % item)    
-"""
-l = state_log
 
-for i in range(len(l)) :
-    if l[i] == IDENTIFIER:
-        if i+1 < len(l):
-            if l[i+1] == IDENTIFIER:
-                l.remove(i+1)
+res = [i[0] for i in groupby(state_log)]
 
-"""
 with open('state_log.txt', 'w') as f:
-    for item in parser_log:
+    for item in res:
         f.write("%s\n" % item)    

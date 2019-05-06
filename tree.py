@@ -1,22 +1,16 @@
-from ete3 import Tree
-t = Tree(name="TT") # Creates an empty tree
-A = t.add_child(name="A") # Adds a new child to the current tree root
-                           # and returns it
-B = t.add_child(name="B") # Adds a second child to the current tree
-                           # root and returns it
-C = A.add_child(name="C") # Adds a new child to one of the branches
-D = C.add_sister(name="D") # Adds a second child to same branch as
-                             # before, but using a sister as the starting
-                             # point
-R = A.add_child(name="R") # Adds a third child to the
-                           # branch. Multifurcations are supported
-
-t.show()
-
+from ete3 import Tree, TreeStyle, TextFace
+import parser as p
 file = open('state_log.txt', 'r')
 log = file.read().split()
 ST = Tree()
 index = 0
+NODE = Tree()
+
+def getState():
+    return log[index]
+
+def nodeName():
+    NODE.add_face(TextFace(getState()), column=0, position = "branch-right")   
 
 def indexSafe():
     return True if index < len(log) else False
@@ -26,36 +20,106 @@ def inc():
     if indexSafe():
         index += 1
 
-def addNode(node):
+def dec():
     global index
     if indexSafe():
-        if not t.name:
-            ST.add_child(name = log[index])
+        index -= 1        
+
+def buildTree():
+    global NODE
+    if index == 0:
+        NODE = ST.add_child(name=getState())
+        NODE.add_face(TextFace(getState()), column=0, position = "branch-right")
+        inc()
+    elif getState() in ["read-stmt", "write-stmt"]:
+        NODE = ST.add_child(name=getState())
+        nodeName()
+        inc()
+        NODE.add_child(name=getState())
+        nodeName()
+        inc()  
+    elif getState() == "if-stmt":
+        NODE = ST.add_child(name=getState())
+        NODE.add_face(TextFace(getState()), column=0, position = "branch-right")
+        inc()
+        inc()
+        N = NODE.add_child(name=getState())
+        N.add_face(TextFace(getState()), column=0, position = "branch-right")
+        dec()
+        NN = N.add_child(name=getState())
+        inc()
+        inc()
+        NNN = NN.add_sister(name=getState())
+        NNN.add_face(TextFace(getState()), column=0, position = "branch-right")
+        inc()
+    elif getState() == 'then':
+        inc()
+    elif getState() == 'assign-stmt':
+        if log[index+2] in ['mulop', 'addop']:
+            N = NODE.add_child(name=getState())
+            N.add_face(TextFace(getState()), column=0, position = "branch-top")
+            inc()
+            inc()
+            NN = N.add_child(name=getState())
+            NN.add_face(TextFace(getState()), column=0, position = "branch-top")
+            dec()
+            NN.add_child(name=getState())
+            inc()
+            inc()
+            NN.add_child(name=getState())
             inc()
         else:
-            if log[index] == 'read-stmt':
-                node2 = node.add_child(name = log[index])
-                inc()
-                addNode(node2)
-            elif log[index] == 'if-stmt':
-                node3 = node.add_child(name = log[index])
-                node4 = node3.add_child(name = log[index+2])
-                node4.add_child(name =log[index+1])
-                node3.add_child(name = log[index+3])
-                inc()
-                inc()
-                inc()
-                inc()
-                addNode(node3)
-            elif log[index] == 'assign-stmt':
-                node4 = node.add_child(name = log[index])
-                inc()
-                node4.add_child(name = log[index])
-                inc()
-                addNode(node4)
+            N = NODE.add_child(name=getState())
+            N.add_face(TextFace(getState()), column=0, position = "branch-top")
+            N.add_face(TextFace('identifier'), column=0, position = "branch-right")
+            inc()
+            inc()
+            N = N.add_child(name=getState())
+            inc()
+    elif getState() == 'repeat-stmt':
+        NODE = NODE.add_child(name=getState())
+        inc()
+    elif getState() == 'until':
+        inc()
+        inc()
+        N = NODE.add_child(name=getState())
+        N.add_face(TextFace('='), column=0, position = "branch-right")
+        dec()
+        N.add_child(name=getState())
+        inc()
+        inc()
+        N.add_child(name=getState())
+        inc()
+    elif getState() == 'end':
+        inc()
+
+        
+
+
+
 
         
         
+        
+
+
+
+
+
+while index < len(log):
+    buildTree()
+    print(ST)
+
+ts = TreeStyle()
+ts.show_leaf_name = True
+ts.show_branch_length = True
+ts.show_branch_support = True
+ts.show_border = True
+ST.show(tree_style=ts)
+
+
+
+
 
 
 
