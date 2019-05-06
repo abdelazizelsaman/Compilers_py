@@ -7,7 +7,6 @@
 #       of tokens or program instructions and build a data structure 
 #       in the form of a parse tree or an abstract syntax tree.
 
-
 import scanner
 from itertools import groupby
 index = 0
@@ -49,23 +48,28 @@ parser_log = []
 tokenList_dummy = []
 file = open('tiny_sample_code.txt', 'r')
 tokenList_dummy = scanner.tokenize(file.read())
-#print(tokenList_dummy)
+
+
+def parse(tokenlist):
+    global tokenList_dummy
+    tokenList_dummy = tokenlist
+    program()
+    with open('parser_output.txt', 'w') as f:
+        for item in parser_log:
+            f.write("%s\n" % item)    
+
+    res = [i[0] for i in groupby(state_log)]
+
+    with open('state_log.txt', 'w') as f:
+        for item in res:
+            f.write("%s\n" % item)
 
 def cstate(strg):
     global state
     global state_log
     global flag_if
     state = strg
-    level = ""
-    if flag_if:
-        level += "|--"
-    if flag_rep:
-        level += "|--"
-    if flag_as:
-        level += "|--"   
-    if flag_wr:
-        level += "|--"
-    state_log.append(level+strg)
+    state_log.append(strg)
 
 def printOutput(strg):
     global parser_log
@@ -277,15 +281,4 @@ def factor():
         match(False,TOKENCLASS)
         printOutput('factor'+MISSING+TERM) 
         factor()   
-
-
-program()
-with open('parser_output.txt', 'w') as f:
-    for item in parser_log:
-        f.write("%s\n" % item)    
-
-res = [i[0] for i in groupby(state_log)]
-
-with open('state_log.txt', 'w') as f:
-    for item in res:
-        f.write("%s\n" % item)    
+    

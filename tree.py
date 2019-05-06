@@ -1,10 +1,19 @@
 from ete3 import Tree, TreeStyle, TextFace
-import parser as p
-file = open('state_log.txt', 'r')
-log = file.read().split()
-ST = Tree()
+
+log = []
 index = 0
+ST = Tree()
 NODE = Tree()
+flagr = False
+flagif = False
+ifNode = Tree()
+repeatNode = Tree()
+
+def checkNode():
+    global repeatNode
+    global NODE
+    if not flagr:
+        NODE = repeatNode
 
 def getState():
     return log[index]
@@ -23,22 +32,29 @@ def inc():
 def dec():
     global index
     if indexSafe():
-        index -= 1        
+        index -= 1      
+
 
 def buildTree():
     global NODE
+    global flagif
+    global flagr
+    global repeatNode
+    global ifNode
     if index == 0:
         NODE = ST.add_child(name=getState())
         NODE.add_face(TextFace(getState()), column=0, position = "branch-right")
         inc()
     elif getState() in ["read-stmt", "write-stmt"]:
-        NODE = ST.add_child(name=getState())
+        checkNode()
+        NODE = NODE.add_child(name=getState())
         nodeName()
         inc()
         NODE.add_child(name=getState())
         nodeName()
         inc()  
     elif getState() == "if-stmt":
+        flag = True
         NODE = ST.add_child(name=getState())
         NODE.add_face(TextFace(getState()), column=0, position = "branch-right")
         inc()
@@ -49,8 +65,7 @@ def buildTree():
         NN = N.add_child(name=getState())
         inc()
         inc()
-        NNN = NN.add_sister(name=getState())
-        NNN.add_face(TextFace(getState()), column=0, position = "branch-right")
+        NN.add_sister(name=getState())
         inc()
     elif getState() == 'then':
         inc()
@@ -77,8 +92,12 @@ def buildTree():
             N = N.add_child(name=getState())
             inc()
     elif getState() == 'repeat-stmt':
+        flagr = True
+        repeatNode = NODE
         NODE = NODE.add_child(name=getState())
+        NODE.add_face(TextFace(getState()), column=0, position = "branch-right")
         inc()
+
     elif getState() == 'until':
         inc()
         inc()
@@ -90,10 +109,24 @@ def buildTree():
         inc()
         N.add_child(name=getState())
         inc()
+        flagr = False
+
     elif getState() == 'end':
         inc()
 
-        
+def draw(syntaxlist):
+    global log
+    log = syntaxlist
+    while index < len(log):
+        buildTree()
+
+    ts = TreeStyle()
+    ts.show_leaf_name = True
+    ts.show_branch_length = True
+    ts.show_branch_support = True
+    ts.show_border = True
+    ST.show(tree_style=ts)
+    ST.render("syntax tree.png", w=183, units="mm")
 
 
 
@@ -106,16 +139,6 @@ def buildTree():
 
 
 
-while index < len(log):
-    buildTree()
-    print(ST)
-
-ts = TreeStyle()
-ts.show_leaf_name = True
-ts.show_branch_length = True
-ts.show_branch_support = True
-ts.show_border = True
-ST.show(tree_style=ts)
 
 
 
