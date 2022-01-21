@@ -11,7 +11,7 @@ docopt==0.6.2
 ete3==3.1.1
 idna==2.8
 igraph==0.1.11
-ipython==7.5.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 isort==4.3.15
 jedi==0.13.3
